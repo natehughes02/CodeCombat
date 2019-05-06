@@ -1,73 +1,28 @@
-# https://codecombat.com/play/level/sarven-sum
-# Чтобы отключить огненные ловушки, добавьте значение lowest.trap к максимальному значению.
-# Идите к белому кресту и скажите Китти ответ.
-# Сокрушите всех огров, если осмелитесь
-# Как только все огры повершены, идите к красному кресту.
-# Остерегайтесь яда, чтобы сохранить здоровье.
-def commandTroops():
-    for index, friend in enumerate(hero.findFriends()):
-        if friend.type == 'soldier' or friend.type == 'archer' or friend.type == 'griffin-rider' or friend.type == 'skeleton':
-            CommandSoldier(friend)
+# To disable the fire-traps add the lowest trap.value to the highest value.
+# Move to the white X and say the answer to Kitty the cougar.
+# Defeat all the ogres if you dare.
+# Once all ogres are defeated move to the red X.
+# Look out for potions to boost your health.
 
-
-def CommandSoldier(soldier):
-    hero.command(soldier, "defend", hero)
-
-def moveTo(position, fast=True):
-    if position:
-        if (hero.isReady("jump") and fast):
-            hero.jumpTo(position)
-        else:
-            hero.move(position)
-
-
-summonTypes = ['soldier','soldier','soldier','soldier','soldier','soldier']
-
-
-def summonTroops():
-    type = summonTypes[len(hero.built) % len(summonTypes)]
-    if hero.gold > hero.costOf(type):
-        hero.summon(type)
-        commandTroops()
-
-
-def attack(target):
-    if target:
-        if (hero.canCast('summon-burl', hero)):
-            hero.cast('summon-burl')
-        elif (hero.canCast('summon-undead')):
-            hero.cast('summon-undead')
-        elif (hero.canCast('raise-dead')):
-            hero.cast('raise-dead')
-        elif (hero.canCast('drain-life', target)):
-            hero.cast('drain-life', target)
-        else:
-            if (hero.canCast('earthskin', self)):
-                hero.cast('earthskin', self)
-            elif (hero.canCast('chain-lightning', target)):
-                hero.cast('chain-lightning', target)
-            else:
-                hero.attack(target)
-
-whiteX = {'x':27, 'y':42}
-redX = {'x':151 , 'y': 118}
-hero.moveXY(whiteX.x, whiteX.y)
+#whiteX = {'x':27, 'y':42} <--- this causes the character to bug
+redX = {'x':151 , 'y': 118} #<--- this allows the character to move to target but stop to fight
 hazards = hero.findHazards()
-max = 0
-min = 999
+max = 99
+min = 0
 for hazard in hazards:
-    if hazard.value> max:
-        max = hazard.value
-    if hazard.value< min:
+    if hazard.value > min:
         min = hazard.value
-hero.say(max + min)
+    if hazard.value < max:
+        max = hazard.value
+hero.moveXY(27, 42)
+hero.say(min + max)
+
 while True:
-    summonTroops()
     enemy = hero.findNearestEnemy()
     item = hero.findNearestItem()
     if enemy:
-        attack(enemy)
+        hero.attack(enemy)
     elif item:
         hero.move(item.pos)
-    else:
+    elif not enemy and not item:
         hero.move(redX)
